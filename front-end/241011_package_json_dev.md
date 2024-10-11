@@ -1,6 +1,11 @@
 # 透彻演示 dependencies 和 devDependencies 区别
 
-todo: 查阅官方资料，说明两者区别。
+## 官方说明
+
+- 参考: [Specifying dependencies and devDependencies in a package.json file](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file)
+
+
+
 
 ## 实战
 
