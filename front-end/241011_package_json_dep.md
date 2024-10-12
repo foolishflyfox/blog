@@ -4,17 +4,18 @@
 
 参考: [Specifying dependencies and devDependencies in a package.json file](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file)
 
-通过 package.json 文件中的 `dependencies` 或 `devDependencies` 字段，可以指定项目依赖的包。执行 `npm install` 后，npm 将下载 dependencies 和 devDependencies 所列出的包。
+通过 package.json 文件中的 `dependencies` 及 `devDependencies` 字段，可以指定项目依赖的包。执行 `npm install` 后，npm 将下载 dependencies 和 devDependencies 所列出的包。
 
 dependencies 和 devDependencies 的区别:
 
-- `dependencies`: 你的应用在生产环境中所依赖的包;
-- `devDependencies`: 你的应用仅在本地开发和测试时所依赖的包。
+- `dependencies`: 指定应用在生产环境中所依赖的包;
+- `devDependencies`: 指定应用仅在本地开发和测试时所依赖的包。
 
+上面的说明并不直观，下面我们通过实验演示两者的区别。
 
 ## 实战
 
-实战概述: 我们创建两个 npm 包 fff-pkg-a 和 fff-pkg-b，其中 fff-pkg-b 依赖于 fff-pkg-a，分别以 dependencies 和 devDependencies 两种方式依赖。之后我们创建一个测试项目 test，查看不同依赖方式的效果。
+实战概述: 我们创建两个 npm 包 fff-pkg-a 和 fff-pkg-b，其中 fff-pkg-b 依赖于 fff-pkg-a，分别以 dependencies 和 devDependencies 两种方式指定依赖。之后我们再创建一个测试项目 test，查看不同依赖方式的效果。
 
 ### 创建 fff-pkg-a 包
 
@@ -46,7 +47,7 @@ export function foo() {
 }
 ```
 
-最后通过 `npm publish` 发布 fff-pkg-a 包，发布 npm 包参考 [如何发布一个自己的 npm 包？](https://i-fanr.com/2023/03/29/npm-package/)。
+最后通过 `npm publish` 发布 fff-pkg-a 包，发布 npm 包参考 [如何发布一个自己的 npm 包](https://i-fanr.com/2023/03/29/npm-package/)。
 
 ### 创建 fff-pkg-b 包
 
@@ -188,7 +189,7 @@ export function bar() {
 }
 ```
 
-此时执行 `node index.mjs` 将报错:
+通过 `pnpm i` 重新安装依赖后，执行 `node index.mjs` 将报错:
 
 ```
 $ node index.mjs 
@@ -211,7 +212,7 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'fff-pkg-a' imported from test
 Node.js v20.10.0
 ```
 
-报错信息提示 fff-pkg-b 的依赖 fff-pkg-a 不能找到，可见，devDependencies 类型的依赖，不会被递归下载，此时查看 node_modules 的文件树:
+报错信息提示 fff-pkg-b 的依赖 fff-pkg-a 不能找到，可见，devDependencies 类型的依赖，不会被递归下载安装，此时查看 node_modules 的文件树:
 
 ```
 $ tree -a node_modules
@@ -272,7 +273,7 @@ node_modules
 └── fff-pkg-b -> .pnpm/fff-pkg-b@1.2.3/node_modules/fff-pkg-b
 ```
 
-此时，如果我们引入 fff-pkg-b@1.2.1 版本会怎么样呢？即 test 自身引入的是 fff-pkg-a@1.1.2，fff-pkg-b@1.2.1 以 dependencies 引入的是 fff-pkg-a@1.1.1，那输出的会是什么结果？
+此时，如果我们引入 fff-pkg-b@1.2.1 版本会怎么样呢？即 test 自身引入的是 fff-pkg-a@1.1.2，fff-pkg-b@1.2.1 以 dependencies 引入的是 fff-pkg-a@1.1.1，此时 test 项目中有多个版本的 fff-pkg-a 库存在，那输出的会是什么结果？
 
 ### 多个 fff-pkg-a 版本并存
 
@@ -330,15 +331,15 @@ node_modules
 └── fff-pkg-b -> .pnpm/fff-pkg-b@1.2.1/node_modules/fff-pkg-b
 ```
 
-### 总结
+## 总结
 
 上述实验可以总结如下：
 
-1. fff-pkg-b 以 dependencies 方式引入 fff-pkg-a@1.1.1，test 使用 fff-pkg-a@1.1.1 中的 foo 函数
-2. fff-pkg-b 以 devDependencies 方式引入 fff-pkg-a@1.1.1，因为 devDependencies 的依赖不能被递归安装，test 执行报错
-3. fff-pkg-b 以 devDependencies 方式引入 fff-pkg-a@1.1.1，test 显式依赖 fff-pkg-a@1.1.2，test 使用 fff-pkg-a@1.1.2 中的 foo 函数
-4. fff-pkg-b 以 dependencies 方式引入 fff-pkg-a@1.1.1，test 显式依赖 fff-pkg-a@1.1.2，test 使用 fff-pkg-a@1.1.1 中的 foo 函数
+1. *fff-pkg-b* 以 **dependencies** 方式引入 *fff-pkg-a@1.1.1*，*test* 调用 `bar` 方法，最终会调用 *fff-pkg-a@1.1.1* 中的 `foo` 函数
+2. *fff-pkg-b* 以 **devDependencies** 方式引入 *fff-pkg-a@1.1.1*，因为 **devDependencies** 的依赖不能被递归安装，会因为找不到 *fff-pkg-a* 库导致 *test* 执行报错
+3. *fff-pkg-b* 以 **devDependencies** 方式引入 *fff-pkg-a@1.1.1*，*test* 显式安装依赖 *fff-pkg-a@1.1.2*，test 调用 `bar` 方法，最终会调用 *fff-pkg-a@1.1.2* 中的 `foo` 函数
+4. *fff-pkg-b* 以 **dependencies** 方式引入 *fff-pkg-a@1.1.1*，*test* 显式安装依赖 *fff-pkg-a@1.1.2*，test 调用 `bar` 方法，最终会调用 *fff-pkg-a@1.1.1* 中的 `foo` 函数
 
-因此，dependencies 与 devDependencies 最主要的区别是，作为依赖包时，能否被递归安装。
+因此，dependencies 与 devDependencies 最主要的区别是，作为依赖包时，能否被递归安装依赖。
 
 
