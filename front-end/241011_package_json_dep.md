@@ -2,9 +2,14 @@
 
 ## 官方说明
 
-- 参考: [Specifying dependencies and devDependencies in a package.json file](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file)
+参考: [Specifying dependencies and devDependencies in a package.json file](https://docs.npmjs.com/specifying-dependencies-and-devdependencies-in-a-package-json-file)
 
+通过 package.json 文件中的 `dependencies` 或 `devDependencies` 字段，可以指定项目依赖的包。执行 `npm install` 后，npm 将下载 dependencies 和 devDependencies 所列出的包。
 
+dependencies 和 devDependencies 的区别:
+
+- `dependencies`: 你的应用在生产环境中所依赖的包;
+- `devDependencies`: 你的应用仅在本地开发和测试时所依赖的包。
 
 
 ## 实战
