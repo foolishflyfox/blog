@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "fff-pkg-a": "1.1.2",
+    "fff-pkg-b": "1.2.1"
+  }
+}
