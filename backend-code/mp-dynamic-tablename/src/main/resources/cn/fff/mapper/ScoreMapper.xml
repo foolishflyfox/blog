@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.fff.mapper.ScoreMapper">
+    <select id="queryStudentScore" resultType="cn.fff.entity.StudentScore">
+        select subject.name as subject_name, student.name as student_name, score.result as score
+        from score score, student student, subject subject
+        where score.student_id=student.id and score.subject_id=subject.id
+    </select>
+</mapper>
