@@ -1,6 +1,6 @@
 # lodash 和 lodash-es 的区别
 
-lodash 是前端常用的工具库，有一个 es 版本 lodash-es，两者的 api 一致，那 lodash-es 相比于 lodash 有什么优势呢？下面通过实验说明两者的区别。
+lodash 是前端常用的工具库，其有一个 es 版本 lodash-es，两者的 api 一致，那 lodash-es 相比于 lodash 有什么优势呢？下面通过实验说明两者的区别。
 
 ## 实验
 
@@ -148,4 +148,7 @@ dist/assets/index-Dg1Odjl_.js   67.14 kB │ gzip: 27.54 kB
 |调用lodash-es的1个函数|63.46 kB|25.63 kB|1.14s|
 |调用lodash-es的2个函数|67.14 kB|27.54 kB|1.25s|
 
-结论: lodash-es 因为使用了 es 语法，vite 编译器在编译时使用 Tree-Shaking 技术，只将使用到的 lodash-es 中的函数打包到 js 文件中，而 lodash 不能使用 Tree-Shaking 技术，会将整个 lodash 包都打进编译后的 js 文件中。
+结论: 
+
+1. lodash-es 因为使用了 es 语法，vite 在编译时会使用 Tree-Shaking 技术，只将使用到的 lodash-es 中的函数打包到 js 文件中。而 lodash 不能使用 Tree-Shaking 技术，会将整个 lodash 包都打进编译后的 js 文件中，导致编译后的 js 文件较大；
+2. 使用 lodash-es 因为存在 Tree-Shaking，编译时间会比使用 lodash 稍长一点；
