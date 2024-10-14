@@ -487,7 +487,3 @@ scripts 中添加命令 `"build-s": "run-s --silent build:*"`，执行结果为:
 ```
 
 可以看到3个命令是并行执行的。
-
-
-
-
