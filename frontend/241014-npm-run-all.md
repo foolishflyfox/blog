@@ -6,8 +6,8 @@
 
 在前端开发中，你是否存在以下烦恼:
 
-1. 写 package.json 的 scripts 字段太过冗长，例如编译命令 `build` 需要执行清理 `clean`, 编译css `build:css`, 编译js `build:js`, 编译html `build:html` 命令，则 `build` 命令需要写成 `build: npm run clean && npm run build:css && npm run build:js && npm run build:html`，这个命令太过冗长，`npm run` 都是重复的，能不能写成 `build: clean build:css build:js build:html`，甚至能不能更简单地写成 `build: clean build:*`。
-2. `build` 命令先进行类型检查，后进行编译 `build: npm run typecheck && vite build`，两者是串行的关系，能不能使两个命令并行以加快编译速度？
+1. 写 package.json 的 scripts 命令时，命令太过冗长，例如编译命令 `build` 需要执行清理 `clean`, 编译css `build:css`, 编译js `build:js`, 编译html `build:html` 命令，则 `build` 命令需要写成 `build: npm run clean && npm run build:css && npm run build:js && npm run build:html`，这个命令太过冗长，`npm run` 都是重复的，能不能写成 `build: clean build:css build:js build:html`，甚至能不能更简单地写成 `build: clean build:*`。
+2. 通常 `build` 的过程是先进行类型检查，后进行编译: `build: npm run typecheck && vite build`，两者是串行的关系，能不能使两个命令并行执行以加快编译速度？
 
 如果你也有类似烦恼，相信这篇文章对你有用。
 
@@ -271,74 +271,37 @@ ERROR: "build:html" exited with 1.
 
 ### 串行与并行混合执行
 
-上面并行的例子中存在一个问题，因为 `clean` 和其他编译命令并行，可能导致刚编译好的文件被清理掉，我们要的结果是先执行 `clean` 命令，执行完成后再并行执行3个编译命令。可以将 `build` 命令修改为 `npm-run-all clean --parallel build:*`，执行结果为:
+上面并行的例子中存在一个问题，因为 `clean` 和其他编译命令并行，可能导致刚编译好的文件被清理掉，我们要的结果是先执行 `clean` 命令，执行完成后再并行执行3个编译命令。可以将 `build` 命令修改为 `npm-run-all --silent clean --parallel build:*`，执行结果为:
 
 ```sh
 > t1@1.0.0 build /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> npm-run-all clean --parallel clean build:*
+> npm-run-all clean --silent --parallel build:*
 
-
-> t1@1.0.0 clean /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./clean.sh
-
-2024年10月14日 星期一 19时57分17秒 CST: start clean
-2024年10月14日 星期一 19时57分18秒 CST: clean finished!
-
-> t1@1.0.0 clean /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./clean.sh
-
-
-> t1@1.0.0 build:html /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-html.sh
-
-
-> t1@1.0.0 build:js /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-js.sh
-
-
-> t1@1.0.0 build:css /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-css.sh
-
-2024年10月14日 星期一 19时57分18秒 CST: start clean
-2024年10月14日 星期一 19时57分18秒 CST: start build:html
-2024年10月14日 星期一 19时57分18秒 CST: start build:js
-2024年10月14日 星期一 19时57分18秒 CST: start build:css
-2024年10月14日 星期一 19时57分19秒 CST: clean finished!
-2024年10月14日 星期一 19时57分19秒 CST: build:html finished!
-2024年10月14日 星期一 19时57分19秒 CST: build:css finished!
-2024年10月14日 星期一 19时57分21秒 CST: build:js finished!
+2024年10月14日 星期一 21时38分20秒 CST: start clean
+2024年10月14日 星期一 21时38分21秒 CST: clean finished!
+2024年10月14日 星期一 21时38分21秒 CST: start build:html
+2024年10月14日 星期一 21时38分21秒 CST: start build:js
+2024年10月14日 星期一 21时38分21秒 CST: start build:css
+2024年10月14日 星期一 21时38分22秒 CST: build:html finished!
+2024年10月14日 星期一 21时38分22秒 CST: build:css finished!
+2024年10月14日 星期一 21时38分25秒 CST: build:js finished!
 ```
 
-如果希望执行顺序为: 先执行 `clean`, 再并行执行 `build:css build:js`, 最后执行 `build:html`，可以将 `build` 命令改为: `npm-run-all clean --parallel build:css build:js --sequential build:html`, 执行结果为：
+
+如果希望执行顺序为: 先执行 `clean`, 再并行执行 `build:css build:js`, 最后执行 `build:html`，可以将 `build` 命令改为: `npm-run-all --silent clean --parallel build:css build:js --sequential build:html`, 执行结果为：
 
 ```sh
 > t1@1.0.0 build /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> npm-run-all clean --parallel build:css build:js --sequential build:html
+> npm-run-all --silent clean --parallel build:css build:js --sequential build:html
 
-
-> t1@1.0.0 clean /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./clean.sh
-
-2024年10月14日 星期一 20时00分28秒 CST: start clean
-2024年10月14日 星期一 20时00分29秒 CST: clean finished!
-
-> t1@1.0.0 build:css /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-css.sh
-
-
-> t1@1.0.0 build:js /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-js.sh
-
-2024年10月14日 星期一 20时00分29秒 CST: start build:css
-2024年10月14日 星期一 20时00分29秒 CST: start build:js
-2024年10月14日 星期一 20时00分30秒 CST: build:css finished!
-2024年10月14日 星期一 20时00分32秒 CST: build:js finished!
-
-> t1@1.0.0 build:html /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-html.sh
-
-2024年10月14日 星期一 20时00分33秒 CST: start build:html
-2024年10月14日 星期一 20时00分34秒 CST: build:html finished!
+2024年10月14日 星期一 21时42分49秒 CST: start clean
+2024年10月14日 星期一 21时42分50秒 CST: clean finished!
+2024年10月14日 星期一 21时42分50秒 CST: start build:js
+2024年10月14日 星期一 21时42分50秒 CST: start build:css
+2024年10月14日 星期一 21时42分51秒 CST: build:css finished!
+2024年10月14日 星期一 21时42分53秒 CST: build:js finished!
+2024年10月14日 星期一 21时42分54秒 CST: start build:html
+2024年10月14日 星期一 21时42分55秒 CST: build:html finished!
 ```
 
 `--sequential` 可以改为 `--serial`。
@@ -361,7 +324,7 @@ ERROR: "build:html" exited with 1.
     "build_css": "./build-css.sh",
     "build_html": "./build-html.sh",
     "build_js": "./build-js.sh",
-    "build": "npm-run-all build_*"
+    "build": "npm-run-all --silent build_*"
   }
 }
 ```
@@ -369,47 +332,27 @@ ERROR: "build:html" exited with 1.
 
 ```sh
 > t1@1.0.0 build /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> npm-run-all build_*
+> npm-run-all --silent build_*
 
-
-> t1@1.0.0 build_css /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-css.sh
-
-2024年10月14日 星期一 20时17分31秒 CST: start build:css
-2024年10月14日 星期一 20时17分32秒 CST: build:css finished!
-
-> t1@1.0.0 build_html /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-html.sh
-
-2024年10月14日 星期一 20时17分33秒 CST: start build:html
-2024年10月14日 星期一 20时17分34秒 CST: build:html finished!
-
-> t1@1.0.0 build_js /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-js.sh
-
-2024年10月14日 星期一 20时17分34秒 CST: start build:js
-2024年10月14日 星期一 20时17分37秒 CST: build:js finished!
+2024年10月14日 星期一 21时44分45秒 CST: start build:css
+2024年10月14日 星期一 21时44分46秒 CST: build:css finished!
+2024年10月14日 星期一 21时44分47秒 CST: start build:html
+2024年10月14日 星期一 21时44分48秒 CST: build:html finished!
+2024年10月14日 星期一 21时44分48秒 CST: start build:js
+2024年10月14日 星期一 21时44分51秒 CST: build:js finished!
 ```
 也是可以正常执行的。
 
-甚至 `*` 也不一定在最后，例如 `build` 改为 `npm-run-all build_*s`，将只执行 `build:css` 和 `build:js`，执行结果为：
+甚至 `*` 也不一定在最后，例如 `build` 改为 `npm-run-all --silent build_*s`，将只执行 `build:css` 和 `build:js`，执行结果为：
 
 ```sh
 > t1@1.0.0 build /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> npm-run-all build_*s
+> npm-run-all --silent build_*s
 
-
-> t1@1.0.0 build_css /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-css.sh
-
-2024年10月14日 星期一 20时19分06秒 CST: start build:css
-2024年10月14日 星期一 20时19分07秒 CST: build:css finished!
-
-> t1@1.0.0 build_js /Users/foolishflyfox/Code/Year2024/Mon10/day14/t1
-> ./build-js.sh
-
-2024年10月14日 星期一 20时19分08秒 CST: start build:js
-2024年10月14日 星期一 20时19分11秒 CST: build:js finished!
+2024年10月14日 星期一 21时45分53秒 CST: start build:css
+2024年10月14日 星期一 21时45分54秒 CST: build:css finished!
+2024年10月14日 星期一 21时45分54秒 CST: start build:js
+2024年10月14日 星期一 21时45分57秒 CST: build:js finished!
 ```
 
 ### 传入参数
