@@ -1,0 +1,25 @@
+{
+  "name": "t1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:foo": "./foo.sh",
+    "test:bar": "./bar.sh",
+    "test": "npm-run-all --parallel \"test:foo 1 abc\" \"test:bar 1 abc\"",
+    "test2": "npm-run-all \"test:foo {1}\" \"test:foo {1} {2}\" \"test:foo {@}\" \"test:foo {*}\" --",
+    "clean": "./clean.sh",
+    "build:css": "./build-css.sh",
+    "build:html": "./build-html.sh",
+    "build:js": "./build-js.sh",
+    "build": "npm-run-all build:*s",
+    "build-s": "run-s --silent build:*",
+    "build-p": "run-p --silent build:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
