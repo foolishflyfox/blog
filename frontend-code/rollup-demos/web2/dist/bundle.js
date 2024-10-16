@@ -1,18 +1,1 @@
-const good = {
-  sale: 0,
-};
-const goodSaleTag = document.getElementById("goodSale");
-function changeGoodSaleTag() {
-  goodSaleTag.innerText = good.sale;
-}const turnoverTag = document.getElementById("turnover");
-function changeTurnoverTag() {
-  turnoverTag.innerHTML = good.sale * 9.9;
-}function updatePage() {
-  changeGoodSaleTag();
-  changeTurnoverTag();
-}
-updatePage();
-window.setInterval(() => {
-  good.sale += 1;
-  updatePage();
-}, 1500);
+const e={sale:0},n=document.getElementById("goodSale");const t=document.getElementById("turnover");function o(){n.innerText=e.sale,t.innerHTML=9.9*e.sale}o(),window.setInterval((()=>{e.sale+=1,o()}),1500);
