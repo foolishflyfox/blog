@@ -4,14 +4,10 @@ const good = {
 const goodSaleTag = document.getElementById("goodSale");
 function changeGoodSaleTag() {
   goodSaleTag.innerText = good.sale;
-}
-
-const turnoverTag = document.getElementById("turnover");
+}const turnoverTag = document.getElementById("turnover");
 function changeTurnoverTag() {
   turnoverTag.innerHTML = good.sale * 9.9;
-}
-
-function updatePage() {
+}function updatePage() {
   changeGoodSaleTag();
   changeTurnoverTag();
 }
