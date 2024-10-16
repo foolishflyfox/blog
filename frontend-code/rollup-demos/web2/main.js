@@ -10,3 +10,7 @@ window.setInterval(() => {
   good.sale += 1;
   updatePage();
 }, 1500);
+
+function mainFoo() {
+  console.log("this is mainFoo");
+}
